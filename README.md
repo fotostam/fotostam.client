@@ -1,11 +1,3 @@
-sts: Exists;
-  $graphql: <T = any>(
-    query: string,
-    variables?: { [key: string]: any }
-  ) => Promise<T>;
-
-  /***Psst — looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
-
 ---
 
 # svelte app
