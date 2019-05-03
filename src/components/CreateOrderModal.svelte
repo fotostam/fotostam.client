@@ -2,7 +2,48 @@
 	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
+
+	let name = '';
+	let group = '';
+    let groepsfoto = false;
+	let photos = [
+	    {
+	        tag:'',
+	        amount: 0
+	    }
+	];
 </script>
+
+<div class='modal-background' on:click='{() => dispatch("close")}'></div>
+
+<div class='modal'>
+	<slot name='header'></slot>
+	<hr>
+
+	<input type="text" bind:value={name} placeholder="Naam">
+
+	<input type="text" bind:value={group} placeholder="Groep">
+
+    <label>
+        <input type=checkbox bind:checked={groepsfoto}>
+        Groepsfoto - niet direct printen.
+    </label>
+
+    <hr>
+
+    {#each photos as photo, i}
+        <div class="photo-input">
+            <input type="text" bind:value={photo.tag}>
+            <input type="number" min="0" bind:value={photo.amount}>
+        </div>
+    {/each}
+
+    <button on:click='{() => {photos = [...photos,{tag:"",amount:0}]}}'>Extra foto</button>
+	<hr>
+
+	<button on:click='{() => dispatch("close")}'>close modal</button>
+	<button on:click='{() => dispatch("order",{order:{name:name,group:group,photos:photos},group:groepsfoto})}'>place order</button>
+</div>
 
 <style>
 	.modal-background {
@@ -31,16 +72,16 @@
 	button {
 		display: block;
 	}
+
+	.photo-input {
+	    display: flex;
+	}
+
+	.photo-input input[type=text] {
+	    flex-grow: 1;
+	}
+
+	.photo-input input[type=number] {
+	    width: 45px;
+	}
 </style>
-
-<div class='modal-background' on:click='{() => dispatch("close")}'></div>
-
-<div class='modal'>
-	<slot name='header'></slot>
-	<hr>
-	<slot></slot>
-	<hr>
-
-	<button on:click='{() => dispatch("close")}'>close modal</button>
-	<button on:click='{() => dispatch("order")}'>place order</button>
-</div>
