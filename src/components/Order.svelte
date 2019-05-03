@@ -5,21 +5,39 @@
 <style>
 .card {
     background-color: lightblue;
-    max-width: 300px;
-    padding: 10px;
+    cursor: pointer;
 }
 
 .header {
     background-color: blue;
     color: white;
+    padding: 10px;
 }
 
 .body {
 
 }
+
+.status-DONE {
+    background-color: lightgreen;
+}
+
+.status-DONE .header {
+    background-color: green;
+}
+
+.status-ON_HOLD {
+    background-color: lightcoral;
+}
+
+.status-ON_HOLD .header {
+    background-color: red;
+}
+
+
 </style>
 
-<div class="card">
+<div class="card status-{order.status}">
     <div class="header">
          {order.name} - {order.group} | {order.createdAt}
     </div>

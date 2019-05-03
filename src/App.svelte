@@ -58,10 +58,146 @@
                                     amount: 2
                                 }
                             ]
-        }
+        },
+         {
+                    id: "asdfasdfasdfa",
+                    createdAt: '234234234',
+                    updatedAt: '234234234',
+                    name: "Henk",
+                    group: "Havik",
+                    status: "PRODUCTION",
+                    photos: [
+                        {
+                            tag: "a1231",
+                            amount: 2
+                        }
+                    ]
+                },
+                {
+                            id: "asdfasdjhffasdfa",
+                            createdAt: '234234234',
+                            updatedAt: '234234234',
+                            name: "Beer",
+                            group: "Havik",
+                            status: "ON_HOLD",
+                            photos: [
+                                {
+                                    tag: "c1231",
+                                    amount: 60
+                                }
+                            ]
+                        },
+                         {
+                                    id: "asdfasfghdfasdfa",
+                                    createdAt: '234234234',
+                                    updatedAt: '234234234',
+                                    name: "Koe",
+                                    group: "Walvissen",
+                                    status: "DONE",
+                                    photos: [
+                                        {
+                                            tag: "a12331",
+                                            amount: 2
+                                        }
+                                    ]
+                },
+                 {
+                            id: "asdfasdfasdfa",
+                            createdAt: '234234234',
+                            updatedAt: '234234234',
+                            name: "Henk",
+                            group: "Havik",
+                            status: "PRODUCTION",
+                            photos: [
+                                {
+                                    tag: "a1231",
+                                    amount: 2
+                                }, {
+                                                                      tag: "a1231",
+                                                                      amount: 2
+                                                                  }, {
+                                                                                                        tag: "a1231",
+                                                                                                        amount: 2
+                                                                                                    }
+                            ]
+                        },
+                        {
+                                    id: "asdfasdjhffasdfa",
+                                    createdAt: '234234234',
+                                    updatedAt: '234234234',
+                                    name: "Beer",
+                                    group: "Havik",
+                                    status: "ON_HOLD",
+                                    photos: [
+                                        {
+                                            tag: "c1231",
+                                            amount: 60
+                                        }
+                                    ]
+                                },
+                                 {
+                                            id: "asdfasfghdfasdfa",
+                                            createdAt: '234234234',
+                                            updatedAt: '234234234',
+                                            name: "Koe",
+                                            group: "Walvissen",
+                                            status: "DONE",
+                                            photos: [
+                                                {
+                                                    tag: "a12331",
+                                                    amount: 2
+                                                }
+                                            ]
+                        },
+                         {
+                                    id: "asdfasdfasdfa",
+                                    createdAt: '234234234',
+                                    updatedAt: '234234234',
+                                    name: "Henk",
+                                    group: "Havik",
+                                    status: "PRODUCTION",
+                                    photos: [
+                                        {
+                                            tag: "a1231",
+                                            amount: 2
+                                        }
+                                    ]
+                                },
+                                {
+                                            id: "asdfasdjhffasdfa",
+                                            createdAt: '234234234',
+                                            updatedAt: '234234234',
+                                            name: "Beer",
+                                            group: "Havik",
+                                            status: "ON_HOLD",
+                                            photos: [
+                                                {
+                                                    tag: "c1231",
+                                                    amount: 60
+                                                },
+                                                   {
+                                                                                                    tag: "c1231",
+                                                                                                    amount: 60
+                                                                                                }
+                                            ]
+                                        },
+                                         {
+                                                    id: "asdfasfghdfasdfa",
+                                                    createdAt: '234234234',
+                                                    updatedAt: '234234234',
+                                                    name: "Koe",
+                                                    group: "Walvissen",
+                                                    status: "DONE",
+                                                    photos: [
+                                                        {
+                                                            tag: "a12331",
+                                                            amount: 2
+                                                        }
+                                                    ]
+                                }
     ];
 
-    $: filteredOrders = orders.filter((order) => order.status === filter);
+    $: filteredOrders = filter === "ALL" ? orders : orders.filter((order) => order.status === filter);
 
     function handleOrderClick() {
         console.log("handle click");
@@ -83,11 +219,12 @@
                 Order toevoegen
             </button>
 
-            <input type="text" bind:value={search}>
-
             <div class="grow"></div>
 
             <div class="filter">
+                <input id="all" type=radio bind:group={filter} value={"ALL"}>
+                <label for="all">ALL</label>
+
                 <input id="onhold" type=radio bind:group={filter} value={"ON_HOLD"}>
                 <label for="onhold">ON_HOLD</label>
 
@@ -111,9 +248,11 @@
 {/if}
 
 <style>
- html {
-    background-color: lightblue;
- }
+
+    :global(body) {
+        padding: 0;
+        background-color: grey;
+    }
 
  button {
     color: deeppink;
@@ -121,7 +260,8 @@
 
  .nav {
     display:flex;
-
+    background-color: lightgray;
+    padding: 10px;
  }
 
  input[type=radio] {
@@ -146,6 +286,13 @@
 
  .orderList {
     display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+    background-color: grey;
+    grid-auto-flow: dense;
+    grid-auto-rows: auto;
+    padding:10px;
+    height: 100%;
  }
 
  .filter {

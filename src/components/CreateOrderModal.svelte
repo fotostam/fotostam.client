@@ -41,8 +41,13 @@
     <button on:click='{() => {photos = [...photos,{tag:"",amount:0}]}}'>Extra foto</button>
 	<hr>
 
+    <div style="display: flex">
 	<button on:click='{() => dispatch("close")}'>close modal</button>
-	<button on:click='{() => dispatch("order",{order:{name:name,group:group,photos:photos},group:groepsfoto})}'>place order</button>
+	<div style="flex-grow: 1;"></div>
+	<button class="order-button" on:click='{() => dispatch("order",{order:{name:name,group:group,photos:photos},group:groepsfoto})}'>
+	    {#if groepsfoto}Bestelling plaatsen{:else}Foto's printen{/if}
+	</button>
+    </div>
 </div>
 
 <style>
