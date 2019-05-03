@@ -14,6 +14,8 @@
 
     let filter = "PRODUCTION";
 
+    let search = "";
+
     let orders = [
         {
             id: "asdfasdfasdfa",
@@ -60,6 +62,10 @@
     ];
 
     $: filteredOrders = orders.filter((order) => order.status === filter);
+
+    function handleOrderClick() {
+        console.log("handle click");
+    }
 </script>
 
 <style>
@@ -76,13 +82,33 @@
     </CreateOrderModal>
 {:else}
     <button on:click="{() => showOrderModal = true}">
-        show modal
+        Order toevoegen
     </button>
+
+    {search}
+
+    <input type="text" bind:value={search}>
+
+    <label>
+    	<input type=radio bind:group={filter} value={"PRODUCTION"}>
+    	PRODUCTION
+    </label>
+
+    <label>
+    	<input type=radio bind:group={filter} value={"ON_HOLD"}>
+    	ON_HOLD
+    </label>
+
+    <label>
+    	<input type=radio bind:group={filter} value={"DONE"}>
+    	DONE
+    </label>
+
     <ul>
-    {#each filteredOrders as {name,photos,status,group}, i}
-    		<li>{i + 1}: {status} | {name} - {group}</li>
-    {:else}
-        er zijn momenteel geen orders;
-    {/each}
+        {#each filteredOrders as {name,photos,status,group}, i}
+                <li on:click="{handleOrderClick}">{i + 1}: {status} | {name} - {group}</li>
+        {:else}
+            er zijn momenteel geen orders;
+        {/each}
     </ul>
 {/if}
