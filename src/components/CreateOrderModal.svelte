@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
+  import PhotoInput from "./PhotoInput.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -47,17 +48,7 @@
     display: block;
   }
 
-  .photo-input {
-    display: flex;
-  }
 
-  .photo-input input[type="text"] {
-    flex-grow: 1;
-  }
-
-  .photo-input input[type="number"] {
-    width: 45px;
-  }
 </style>
 
 <div transition:fade class="modal-background" />
@@ -79,10 +70,7 @@
 
   <div class="body">
     {#each photos as photo, i}
-      <div transition:fly={{ x: 200, duration: 300 }} class="photo-input">
-        <input type="text" bind:value={photo.tag} />
-        <input type="number" min="0" bind:value={photo.amount} />
-      </div>
+      <PhotoInput></PhotoInput>
     {/each}
   </div>
 

@@ -1,11 +1,11 @@
 <script>
-  import ApolloClient from "apollo-boost";
-  import { setClient } from "svelte-apollo";
+  import ApolloClient, { gql } from "apollo-boost";
+  import { setClient, query, mutate } from "svelte-apollo";
   import CreateOrderModal from "./components/CreateOrderModal.svelte";
   import Order from "./components/Order.svelte";
 
   const client = new ApolloClient({
-    uri: "localhost:4466"
+    uri: "http://localhost:4000"
   });
 
   setClient(client);
@@ -16,191 +16,49 @@
 
   let search = "";
 
-  let orders = [
+  const ORDERS_BY_STATUS = gql`
     {
-      id: "asdfasdfasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Henk",
-      group: "Havik",
-      status: "PRODUCTION",
-      photos: [
-        {
-          tag: "a1231",
-          amount: 2
+      openOrders {
+        id
+        name
+        group
+        photos {
+          id
+          tag
+          amount
         }
-      ]
-    },
-    {
-      id: "asdfasdjhffasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Beer",
-      group: "Havik",
-      status: "ON_HOLD",
-      photos: [
-        {
-          tag: "c1231",
-          amount: 60
-        }
-      ]
-    },
-    {
-      id: "asdfasfghdfasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Koe",
-      group: "Walvissen",
-      status: "DONE",
-      photos: [
-        {
-          tag: "a12331",
-          amount: 2
-        }
-      ]
-    },
-    {
-      id: "asdfasdfasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Henk",
-      group: "Havik",
-      status: "PRODUCTION",
-      photos: [
-        {
-          tag: "a1231",
-          amount: 2
-        }
-      ]
-    },
-    {
-      id: "asdfasdjhffasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Beer",
-      group: "Havik",
-      status: "ON_HOLD",
-      photos: [
-        {
-          tag: "c1231",
-          amount: 60
-        }
-      ]
-    },
-    {
-      id: "asdfasfghdfasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Koe",
-      group: "Walvissen",
-      status: "DONE",
-      photos: [
-        {
-          tag: "a12331",
-          amount: 2
-        }
-      ]
-    },
-    {
-      id: "asdfasdfasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Henk",
-      group: "Havik",
-      status: "PRODUCTION",
-      photos: [
-        {
-          tag: "a1231",
-          amount: 2
-        },
-        {
-          tag: "a1231",
-          amount: 2
-        },
-        {
-          tag: "a1231",
-          amount: 2
-        }
-      ]
-    },
-    {
-      id: "asdfasdjhffasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Beer",
-      group: "Havik",
-      status: "ON_HOLD",
-      photos: [
-        {
-          tag: "c1231",
-          amount: 60
-        }
-      ]
-    },
-    {
-      id: "asdfasfghdfasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Koe",
-      group: "Walvissen",
-      status: "DONE",
-      photos: [
-        {
-          tag: "a12331",
-          amount: 2
-        }
-      ]
-    },
-    {
-      id: "asdfasdfasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Henk",
-      group: "Havik",
-      status: "PRODUCTION",
-      photos: [
-        {
-          tag: "a1231",
-          amount: 2
-        }
-      ]
-    },
-    {
-      id: "asdfasdjhffasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Beer",
-      group: "Havik",
-      status: "ON_HOLD",
-      photos: [
-        {
-          tag: "c1231",
-          amount: 60
-        },
-        {
-          tag: "c1231",
-          amount: 60
-        }
-      ]
-    },
-    {
-      id: "asdfasfghdfasdfa",
-      createdAt: "234234234",
-      updatedAt: "234234234",
-      name: "Koe",
-      group: "Walvissen",
-      status: "DONE",
-      photos: [
-        {
-          tag: "a12331",
-          amount: 2
-        }
-      ]
+      }
     }
-  ];
+  `;
 
-  $: filteredOrders =
-    filter === "ALL" ? orders : orders.filter(order => order.status === filter);
+  const orders = query(client, {
+    query: ORDERS_BY_STATUS,
+    variables: {}
+  });
+
+  const ADD_ORDER = gql`
+    mutation createOrder($order : PostOrderInput!) {
+      createOrder(order: $order) {
+        id
+      }
+    }
+  `;
+
+  async function addOrder(order, group) {
+    order.status = group?"OPEN":"PRODUCTION";
+    try {
+      await mutate(client, {
+        mutation: ADD_ORDER,
+        variables: { order:order }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    orders.refetch();
+    showOrderModal = false;
+  }
+
+  $: orders.refetch({filter});
 
   function handleOrderClick() {
     console.log("handle click");
@@ -266,7 +124,7 @@
 {#if showOrderModal}
   <CreateOrderModal
     on:close={() => (showOrderModal = false)}
-    on:order={e => console.log(e.detail)}>
+    on:order={e => addOrder(e.detail.order, e.detail.group)}>
     <h2 slot="header">Order aanmaken</h2>
   </CreateOrderModal>
 {/if}
@@ -296,8 +154,13 @@
   </div>
 
   <div class="orderList">
-    {#each filteredOrders as order, i}
-      <Order {order} />
-    {:else}er zijn momenteel geen orders; {/each}
+    {#await $orders}
+      <li>Loading...</li>
+    {:then result}
+      {#each result.data.openOrders as order, i}
+        <Order {order} />
+      {:else}er zijn momenteel geen orders; {/each}
+    {:catch}
+    {/await}
   </div>
 </div>
