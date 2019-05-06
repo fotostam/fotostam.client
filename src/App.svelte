@@ -269,40 +269,35 @@
     on:order={e => console.log(e.detail)}>
     <h2 slot="header">Order aanmaken</h2>
   </CreateOrderModal>
-{:else}
-  <div class="body">
-    <div class="nav">
-      <button on:click={() => (showOrderModal = true)}>Order toevoegen</button>
+{/if}
+<div class="body">
+  <div class="nav">
+    <button on:click={() => (showOrderModal = true)}>Order toevoegen</button>
 
-      <div class="grow" />
+    <div class="grow" />
 
-      <div class="filter">
-        <input id="all" type="radio" bind:group={filter} value={'ALL'} />
-        <label for="all">ALL</label>
+    <div class="filter">
+      <input id="all" type="radio" bind:group={filter} value={'ALL'} />
+      <label for="all">ALL</label>
 
-        <input
-          id="onhold"
-          type="radio"
-          bind:group={filter}
-          value={'ON_HOLD'} />
-        <label for="onhold">ON_HOLD</label>
+      <input id="onhold" type="radio" bind:group={filter} value={'ON_HOLD'} />
+      <label for="onhold">ON_HOLD</label>
 
-        <input
-          id="production"
-          type="radio"
-          bind:group={filter}
-          value={'PRODUCTION'} />
-        <label for="production">PRODUCTION</label>
+      <input
+        id="production"
+        type="radio"
+        bind:group={filter}
+        value={'PRODUCTION'} />
+      <label for="production">PRODUCTION</label>
 
-        <input id="done" type="radio" bind:group={filter} value={'DONE'} />
-        <label for="done">DONE</label>
-      </div>
-    </div>
-
-    <div class="orderList">
-      {#each filteredOrders as order, i}
-        <Order {order} />
-      {:else}er zijn momenteel geen orders; {/each}
+      <input id="done" type="radio" bind:group={filter} value={'DONE'} />
+      <label for="done">DONE</label>
     </div>
   </div>
-{/if}
+
+  <div class="orderList">
+    {#each filteredOrders as order, i}
+      <Order {order} />
+    {:else}er zijn momenteel geen orders; {/each}
+  </div>
+</div>

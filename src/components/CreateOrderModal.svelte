@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import { fade, fly } from "svelte/transition";
 
   const dispatch = createEventDispatcher();
 
@@ -38,6 +39,10 @@
     background: white;
   }
 
+  .body {
+	  overflow: hidden;
+  }
+
   button {
     display: block;
   }
@@ -55,9 +60,9 @@
   }
 </style>
 
-<div class="modal-background" on:click={() => dispatch('close')} />
+<div transition:fade class="modal-background" />
 
-<div class="modal">
+<div transition:fly={{ y: 200, duration: 1000 }} class="modal">
   <slot name="header" />
   <hr />
 
@@ -72,12 +77,14 @@
 
   <hr />
 
-  {#each photos as photo, i}
-    <div class="photo-input">
-      <input type="text" bind:value={photo.tag} />
-      <input type="number" min="0" bind:value={photo.amount} />
-    </div>
-  {/each}
+  <div class="body">
+    {#each photos as photo, i}
+      <div transition:fly={{ x: 200, duration: 300 }} class="photo-input">
+        <input type="text" bind:value={photo.tag} />
+        <input type="number" min="0" bind:value={photo.amount} />
+      </div>
+    {/each}
+  </div>
 
   <button
     on:click={() => {

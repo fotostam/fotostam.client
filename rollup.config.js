@@ -6,6 +6,7 @@ import { terser } from 'rollup-plugin-terser';
 import json from "rollup-plugin-json";
 import builtins from 'rollup-plugin-node-builtins';
 import replace from "rollup-plugin-replace";
+import analyze from 'rollup-plugin-analyzer'
 
 const production = !process.env.ROLLUP_WATCH;
 
