@@ -12,13 +12,14 @@
 
   let showOrderModal = false;
 
-  let filter = "PRODUCTION";
+  let status = "IN_PRODUCTION";
 
   let search = "";
 
-  const ORDERS_BY_STATUS = gql`
+
+  const ORDERS = gql`
     {
-      openOrders {
+      orders {
         id
         name
         group
@@ -26,13 +27,14 @@
           id
           tag
           amount
+          url
         }
       }
     }
   `;
 
   const orders = query(client, {
-    query: ORDERS_BY_STATUS,
+    query: ORDERS,
     variables: {}
   });
 
@@ -45,7 +47,7 @@
   `;
 
   async function addOrder(order, group) {
-    order.status = group?"OPEN":"PRODUCTION";
+    order.status = group ? "ON_HOLD" :"IN_PRODUCTION";
     try {
       await mutate(client, {
         mutation: ADD_ORDER,
@@ -58,7 +60,7 @@
     showOrderModal = false;
   }
 
-  $: orders.refetch({filter});
+  $: orders.refetch({status});
 
   function handleOrderClick() {
     console.log("handle click");
@@ -112,7 +114,7 @@
     height: 100%;
   }
 
-  .filter {
+  .status {
     align-self: flex-end;
   }
 
@@ -134,21 +136,28 @@
 
     <div class="grow" />
 
-    <div class="filter">
-      <input id="all" type="radio" bind:group={filter} value={'ALL'} />
+    <div class="status">
+      <input id="all" type="radio" bind:group={status} value={'ALL'} />
       <label for="all">ALL</label>
 
-      <input id="onhold" type="radio" bind:group={filter} value={'ON_HOLD'} />
+      <input id="onhold" type="radio" bind:group={status} value={'ON_HOLD'} />
       <label for="onhold">ON_HOLD</label>
 
       <input
         id="production"
         type="radio"
-        bind:group={filter}
-        value={'PRODUCTION'} />
-      <label for="production">PRODUCTION</label>
+        bind:group={status}
+        value={'IN_PRODUCTION'} />
+      <label for="production">IN_PRODUCTION</label>
 
-      <input id="done" type="radio" bind:group={filter} value={'DONE'} />
+      <input
+        id="error"
+        type="radio"
+        bind:group={status}
+        value={'ERROR'} />
+      <label for="error">ERROR</label>
+
+      <input id="done" type="radio" bind:group={status} value={'DONE'} />
       <label for="done">DONE</label>
     </div>
   </div>
@@ -157,8 +166,8 @@
     {#await $orders}
       <li>Loading...</li>
     {:then result}
-      {#each result.data.openOrders as order, i}
-        <Order {order} />
+      {#each result.data.orders as order, i}
+        <Order {order}/>
       {:else}er zijn momenteel geen orders; {/each}
     {:catch}
     {/await}

@@ -35,8 +35,11 @@
   <div class="header"> {order.name} - {order.group} | {order.createdAt}</div>
   <div class="body">
     <ul>
-      {#each order.photos as { tag, amount }, i}
+      {#each order.photos as { tag, amount, url }, i}
         <li>{amount}X | {tag}</li>
+        <li>
+          <img src="{url}" />
+        </li>
       {:else}Dit is een lege order {/each}
     </ul>
   </div>

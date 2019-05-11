@@ -14,6 +14,7 @@
     query findImage($tag: String) {
       findImage(tag: $tag) {
         filename
+        url
       }
     }
   `;
