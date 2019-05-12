@@ -1,7 +1,13 @@
 <script>
   import { createEventDispatcher } from "svelte";
 
+  export let order;
+
   const dispatch = createEventDispatcher();
+
+  console.log(order);
+
+  let selectedPhoto = null;
 </script>
 
 <style>
@@ -28,6 +34,24 @@
     background: white;
   }
 
+  .autocomplete-results {
+    display: flex;
+  }
+
+  .autocomplete-result {
+    cursor: pointer;
+    max-width: 150px;
+    padding: 1px;
+  }
+
+  .autocomplete-result.selected {
+    background-color: lightgray;
+  }
+
+  img {
+    width: 100%;
+  }
+
   button {
     display: block;
   }
@@ -37,9 +61,40 @@
 
 <div class="modal">
   <slot name="header" />
-  <hr />
-  <slot />
-  <hr />
 
-  <button on:click={() => dispatch('close')}>close modal</button>
+  {#if order.status == "ON_HOLD"}
+    <button on:click={() => dispatch('close')}>Order afdrukken</button>
+  {:else if  order.status == "IN_PRODUCTION"}
+    <button on:click={() => dispatch('close')}>Order afronden</button>
+  {:else}
+    <!-- else content here -->
+  {/if}
+
+  <hr />
+  <div class="autocomplete-results">
+    {#each order.photos as photo, i}
+      <div
+        class="autocomplete-result {selectedPhoto == photo.id ? 'selected' : ''}"
+        on:click={e => {
+          selectedPhoto = photo.id;
+        }}>
+        <img src={photo.url} alt={photo.tag} />
+        <span>{photo.amount}X | {photo.tag}</span>
+      </div>
+    {/each}
+  </div>
+
+  <hr />
+  <div style="display: flex">
+    <button on:click={() => dispatch('close')}>close modal</button>
+    <div style="flex-grow: 1;" />
+    <button
+      disabled={!selectedPhoto}
+      on:click={() => {
+        alert("photo wordt geprint");
+        selectedPhoto = null;
+      }}>
+      Print selected
+    </button>
+  </div>
 </div>

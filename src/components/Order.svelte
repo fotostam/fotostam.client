@@ -1,6 +1,7 @@
 <script>
-  export let order;
   import { createEventDispatcher } from 'svelte';
+
+  export let order;
 
 	const dispatch = createEventDispatcher();
 </script>

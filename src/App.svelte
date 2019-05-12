@@ -25,6 +25,7 @@
         id
         name
         group
+        status
         photos {
           id
           tag
@@ -132,7 +133,7 @@
 {/if}
 
 {#if orderActionTarget}
-  <OrderActionModal order="orderActionTarget" on:close={() => (orderActionTarget = null)}>Dit
+  <OrderActionModal order={orderActionTarget} on:close={() => (orderActionTarget = null)}>Dit
     is een test</OrderActionModal>
 {/if}
 
