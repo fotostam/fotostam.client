@@ -15,24 +15,27 @@
 
   let orderActionTarget = null;
 
-  let filter = "PRODUCTION";
+  let status = "IN_PRODUCTION";
 
   let search = "";
 
   const ORDERS_BY_STATUS = gql`
-    {
-      orders {
-        id
-        name
-        group
-        photos {
+    
+      query OrdersByStatus($status: Status!) {
+        ordersByStatus(status: $status) {
           id
-          tag
-          amount
-          url
+          name
+          group
+          status
+          photos {
+            id
+            tag
+            amount
+            url 
+          }
         }
       }
-    }
+    
   `;
 
   const orders = query(client, {
@@ -61,6 +64,8 @@
     orders.refetch();
     showOrderCreateModal = false;
   }
+
+  $: orders.refetch({status});
 
   function handleOrderClick() {
     console.log("handle click");
@@ -132,8 +137,8 @@
 {/if}
 
 {#if orderActionTarget}
-  <OrderActionModal order="orderActionTarget" on:close={() => (orderActionTarget = null)}>Dit
-    is een test</OrderActionModal>
+  <OrderActionModal order="orderActionTarget" on:close={() => (orderActionTarget = null)}>
+  Dit is een test</OrderActionModal>
 {/if}
 
 <div class="body">
@@ -143,16 +148,19 @@
     <div class="grow" />
 
     <div class="filter">
-      <input id="all" type="radio" bind:group={filter} value={'ALL'} />
+      <input id="all" type="radio" bind:group={status} value={'ALL'} />
       <label for="all">ALL</label>
 
-      <input id="onhold" type="radio" bind:group={filter} value={'ON_HOLD'} />
+      <input id="onhold" type="radio" bind:group={status} value={'ON_HOLD'} />
       <label for="onhold">ON_HOLD</label>
 
-      <input id="production" type="radio" bind:group={filter} value={'PRODUCTION'} />
+      <input id="production" type="radio" bind:group={status} value={'IN_PRODUCTION'} />
       <label for="production">PRODUCTION</label>
 
-      <input id="done" type="radio" bind:group={filter} value={'DONE'} />
+      <input id="error" type="radio" bind:group={status} value={'ERROR'} />
+      <label for="error">ERROR</label>
+
+      <input id="done" type="radio" bind:group={status} value={'DONE'} />
       <label for="done">DONE</label>
     </div>
   </div>
@@ -161,7 +169,7 @@
     {#await $orders}
       <li>Loading...</li>
     {:then result}
-      {#each result.data.orders as order, i}
+      {#each result.data.ordersByStatus as order, i}
         <Order
           on:click={() => {
             orderActionTarget = order;
