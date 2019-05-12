@@ -49,7 +49,7 @@
   `;
 
   async function addOrder(order, group) {
-    order.status = group ? "ON_HOLD" : "IN_PRODUCTION";
+    order.status = group ? 'ON_HOLD' : 'IN_PRODUCTION';
     try {
       await mutate(client, {
         mutation: ADD_ORDER,
@@ -59,7 +59,7 @@
       console.log(error);
     }
     orders.refetch();
-    showOrderModal = false;
+    showOrderCreateModal = false;
   }
 
   function handleOrderClick() {
