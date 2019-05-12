@@ -1,8 +1,12 @@
 <script>
   export let order;
   import { createEventDispatcher } from 'svelte';
+  import moment from 'moment';
 
-	const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher();
+  
+
+  let badge = moment(order.createdAt).format('dd HH:mm');
 </script>
 
 <style>
@@ -40,10 +44,14 @@
   .status-ERROR .header {
     background-color: red;
   }
+
+  .badge {
+    background-color: grey
+  }
 </style>
 
 <div class="card status-{order.status}" on:click={() => dispatch('click')}>
-  <div class="header"> {order.name} - {order.group} | {order.createdAt}</div>
+  <div class="header"> {order.name} - {order.group} <span class="badge">{ badge }</span></div>
   <div class="body">
     <ul>
       {#each order.photos as { tag, amount, url }, i}

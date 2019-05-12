@@ -27,6 +27,7 @@
           name
           group
           status
+          createdAt
           photos {
             id
             tag
