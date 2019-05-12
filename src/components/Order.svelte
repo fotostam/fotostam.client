@@ -31,6 +31,14 @@
   }
 
   .status-ON_HOLD .header {
+    background-color: orange;
+  }
+
+  .status-ERROR {
+    background-color: lightcoral;
+  }
+
+  .status-ERROR .header {
     background-color: red;
   }
 </style>
