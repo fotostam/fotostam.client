@@ -8,12 +8,7 @@
   let name = "";
   let group = "";
   let groepsfoto = false;
-  let photos = [
-    {
-      tag: "",
-      amount: 0
-    }
-  ];
+  let photos = [];
 </script>
 
 <style>
@@ -28,16 +23,27 @@
 
   .modal {
     position: absolute;
+    display: flex;
     left: 50%;
     top: 50%;
     width: calc(100vw - 4em);
-    max-width: 32em;
+    max-width: 80%;
     max-height: calc(100vh - 4em);
     overflow: auto;
     transform: translate(-50%, -50%);
     padding: 1em;
     border-radius: 0.2em;
     background: white;
+  }
+
+  .input {
+    min-width: 32em;
+    padding-right: 1em;
+  }
+
+  .selector {
+    width:auto;
+    flex-grow: 1;
   }
 
   .body {
@@ -48,12 +54,24 @@
     display: block;
   }
 
+  .photo-input {
+    display: flex;
+  }
+
+  .photo-input input[type="text"] {
+    flex-grow: 1;
+  }
+
+  .photo-input input[type="number"] {
+    width: 45px;
+  }
 
 </style>
 
 <div transition:fade class="modal-background" />
 
 <div transition:fly={{ y: 200, duration: 1000 }} class="modal">
+  <div class="input">
   <slot name="header" />
   <hr />
 
@@ -70,7 +88,10 @@
 
   <div class="body">
     {#each photos as photo, i}
-      <PhotoInput></PhotoInput>
+      <div transition:fly={{ x: 200, duration: 300 }} class="photo-input">
+        <input type="text" disabled bind:value={photo.tag} />
+        <input type="number" min="0" bind:value={photo.amount} />
+      </div>
     {/each}
   </div>
 
@@ -93,5 +114,11 @@
         })}>
       {#if groepsfoto}Bestelling plaatsen {:else}Foto's printen {/if}
     </button>
+  </div>
+  </div>
+  <div class="selector">
+    <PhotoInput on:select={(e) => {
+      photos = [...photos, { tag: e.detail.tag, amount: 1 }];
+    }}></PhotoInput>
   </div>
 </div>
