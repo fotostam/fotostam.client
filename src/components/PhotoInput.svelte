@@ -35,17 +35,36 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
   }
+
+  .autocomplete-result {
+    cursor: pointer;
+    padding: 1px;
+  }
+
+  .autocomplete-result:hover {
+    background-color:lightgray;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  img {
+    width: 100%;
+  }
+
 </style>
 
 <div class="autocomplete">
-  <input bind:value type="text" />
+  <input bind:value type="text" placeholder="Foto zoeken..." />
   {#await $photos}
     <li>Loading...</li>
   {:then results}
     <div class="autocomplete-results {!isOpen ? ' hide-results' : ''}">
-      {#each results.data.findImage as result, i}
+      {#each results.data.findImage.slice(0,20) as result, i}
         <div class="autocomplete-result" on:click={e => dispatch('select',{tag:result.filename})}>
           <img src={result.url} alt={result.filename} />
+          <span>{ result.filename }</span>
         </div>
       {/each}
     </div>

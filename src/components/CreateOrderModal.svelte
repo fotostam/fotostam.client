@@ -95,12 +95,6 @@
     {/each}
   </div>
 
-  <button
-    on:click={() => {
-      photos = [...photos, { tag: '', amount: 0 }];
-    }}>
-    Extra foto
-  </button>
   <hr />
 
   <div style="display: flex">

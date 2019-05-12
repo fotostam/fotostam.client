@@ -1,5 +1,8 @@
 <script>
   export let order;
+  import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
 </script>
 
 <style>
@@ -31,7 +34,7 @@
   }
 </style>
 
-<div class="card status-{order.status}">
+<div class="card status-{order.status}" on:click={() => dispatch('click')}>
   <div class="header"> {order.name} - {order.group} | {order.createdAt}</div>
   <div class="body">
     <ul>
