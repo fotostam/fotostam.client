@@ -48,18 +48,32 @@
   .badge {
     background-color: grey
   }
+
+  .body {
+    display: flex;
+  }
+
+  .photo {
+    
+  }
+
+  .photo img{ 
+
+  }
+
+  .photo span{ 
+
+  }
 </style>
 
 <div class="card status-{order.status}" on:click={() => dispatch('click')}>
   <div class="header"> {order.name} - {order.group} <span class="badge">{ badge }</span></div>
   <div class="body">
-    <ul>
       {#each order.photos as { tag, amount, url }, i}
-        <li>{amount}X | {tag}</li>
-        <li>
-          <img src="{url}" />
-        </li>
+        <div class="photo">
+          <span>{amount}X | {tag}</span>
+            <img src="{url}" />
+        </div>
       {:else}Dit is een lege order {/each}
-    </ul>
   </div>
 </div>

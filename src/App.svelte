@@ -51,8 +51,12 @@
     }
   `;
 
-  async function addOrder(order, group) {
-    order.status = group ? 'ON_HOLD' : 'IN_PRODUCTION';
+  async function addOrder(order) {
+    if(order.goupphoto) order.status = "ON_HOLD";
+    else if(order.digital && !order.print) order.status = "DONE";
+    else if(order.print) order.status = "IN_PRODUCTION";
+    else order.status = "ERROR";
+
     try {
       await mutate(client, {
         mutation: ADD_ORDER,
@@ -67,9 +71,6 @@
 
   $: orders.refetch({status});
 
-  function handleOrderClick() {
-    console.log("handle click");
-  }
 </script>
 
 <style>
@@ -131,13 +132,13 @@
 {#if showOrderCreateModal}
   <CreateOrderModal
     on:close={() => (showOrderCreateModal = false)}
-    on:order={e => addOrder(e.detail.order, e.detail.group)}>
+    on:order={e => addOrder(e.detail.order)}>
     <h2 slot="header">Order aanmaken</h2>
   </CreateOrderModal>
 {/if}
 
 {#if orderActionTarget}
-  <OrderActionModal order={orderActionTarget} on:close={() => (orderActionTarget = null)}>Dit
+  <OrderActionModal order={orderActionTarget} on:close={() => {orderActionTarget = null; orders.refetch(status);}}>Dit
     is een test</OrderActionModal>
 {/if}
 

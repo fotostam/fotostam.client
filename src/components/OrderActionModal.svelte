@@ -1,13 +1,39 @@
 <script>
+  import { gql } from "apollo-boost";
+  import { getClient, mutate } from "svelte-apollo";
   import { createEventDispatcher } from "svelte";
 
   export let order;
 
+  const client = getClient();
+
   const dispatch = createEventDispatcher();
 
-  console.log(order);
-
   let selectedPhoto = null;
+
+  const UPDATE_ORDER = gql`
+      mutation updateOrder($order: UpdateOrderInput!) {
+        updateOrder(order: $order) {
+          id
+        }
+      }
+    `;
+
+  async function updateOrder(status) {
+    let _order = (({ id, status, name, group }) => ({ id, status, name, group }))(order);
+    console.log(_order,order);
+    _order.status = status;
+    try {
+      await mutate(client, {
+        mutation: UPDATE_ORDER,
+        variables: { order: _order }
+      });
+      dispatch('close');
+    } catch (error) {
+      alert(error);
+    }
+  }
+
 </script>
 
 <style>
@@ -63,9 +89,9 @@
   <slot name="header" />
 
   {#if order.status == "ON_HOLD"}
-    <button on:click={() => dispatch('close')}>Order afdrukken</button>
+    <button on:click={() => updateOrder("IN_PRODUCTION")}>Order afdrukken</button>
   {:else if  order.status == "IN_PRODUCTION"}
-    <button on:click={() => dispatch('close')}>Order afronden</button>
+    <button on:click={() => updateOrder("DONE")}>Order afronden</button>
   {:else}
     <!-- else content here -->
   {/if}
