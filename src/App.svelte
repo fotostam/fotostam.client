@@ -27,6 +27,7 @@
           name
           group
           status
+          createdAt
           photos {
             id
             tag
@@ -147,9 +148,6 @@
     <div class="grow" />
 
     <div class="filter">
-      <input id="all" type="radio" bind:group={status} value={'ALL'} />
-      <label for="all">ALL</label>
-
       <input id="onhold" type="radio" bind:group={status} value={'ON_HOLD'} />
       <label for="onhold">ON_HOLD</label>
 
