@@ -12,28 +12,50 @@
   let selectedPhoto = null;
 
   const UPDATE_ORDER = gql`
-      mutation updateOrder($order: UpdateOrderInput!) {
-        updateOrder(order: $order) {
-          id
-        }
+    mutation updateOrder($order: UpdateOrderInput!) {
+      updateOrder(order: $order) {
+        id
+        status
       }
-    `;
+    }
+  `;
+
+  const PRINT_ORDER = gql`
+    mutation printOrder($id: ID!) {
+      printOrder(id: $id) {
+        id
+      }
+    }
+  `;
 
   async function updateOrder(status) {
-    let _order = (({ id, status, name, group }) => ({ id, status, name, group }))(order);
-    console.log(_order,order);
+    let _order = (({ id, status, name, group }) => ({
+      id,
+      status,
+      name,
+      group
+    }))(order);
     _order.status = status;
     try {
-      await mutate(client, {
+      const result = await mutate(client, {
         mutation: UPDATE_ORDER,
         variables: { order: _order }
       });
-      dispatch('close');
+
+      if (result && result.data.updateOrder.status == "IN_PRODUCTION") {
+        await mutate(client, {
+          mutation: PRINT_ORDER,
+          variables: {
+            id: result.data.updateOrder.id
+          }
+        });
+      }
+
+      dispatch("close");
     } catch (error) {
       alert(error);
     }
   }
-
 </script>
 
 <style>
@@ -44,6 +66,7 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.3);
+    z-index: 100;
   }
 
   .modal {
@@ -58,6 +81,7 @@
     padding: 1em;
     border-radius: 0.2em;
     background: white;
+    z-index: 101;
   }
 
   .autocomplete-results {
@@ -88,13 +112,29 @@
 <div class="modal">
   <slot name="header" />
 
-  {#if order.status == "ON_HOLD"}
-    <button on:click={() => updateOrder("IN_PRODUCTION")}>Order afdrukken</button>
-  {:else if  order.status == "IN_PRODUCTION"}
-    <button on:click={() => updateOrder("DONE")}>Order afronden</button>
+  {#if order.status == 'ON_HOLD'}
+    <button on:click={() => updateOrder('IN_PRODUCTION')}>
+      Order afdrukken
+    </button>
+  {:else if order.status == 'IN_PRODUCTION'}
+    <button on:click={() => updateOrder('DONE')}>Order afronden</button>
   {:else}
     <!-- else content here -->
   {/if}
+
+  <hr />
+  Naam: {order.name}
+  <br />
+  Email: {order.email}
+  <br />
+  Groep: {order.group} {order.camp} {order.subtype}
+  <br />
+  Status: {order.status}
+  <br />
+  Groupfoto: {order.groupphoto}
+  <br />
+  Digital: {order.digital}
+  <br />
 
   <hr />
   <div class="autocomplete-results">
@@ -117,7 +157,7 @@
     <button
       disabled={!selectedPhoto}
       on:click={() => {
-        alert("photo wordt geprint");
+        alert('photo wordt geprint');
         selectedPhoto = null;
       }}>
       Print selected

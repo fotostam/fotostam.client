@@ -1,6 +1,6 @@
 <script>
   import ApolloClient, { gql } from "apollo-boost";
-  import { setClient, query, mutate } from "svelte-apollo";
+  import { setClient, query, mutate, subscribe } from "svelte-apollo";
   import CreateOrderModal from "./components/CreateOrderModal.svelte";
   import OrderActionModal from "./components/OrderActionModal.svelte";
   import Order from "./components/Order.svelte";
@@ -20,27 +20,34 @@
   let search = "";
 
   const ORDERS_BY_STATUS = gql`
-      query OrdersByStatus($status: Status!) {
-        ordersByStatus(status: $status) {
-
+    query OrdersByStatus($status: Status!) {
+      ordersByStatus(status: $status) {
+        id
+        name
+        group
+        status
+        createdAt
+        subtype
+        camp
+        groupphoto
+        digital
+        print
+        photos {
           id
-          name
-          group
+          tag
           status
-          createdAt
-          photos {
-            id
-            tag
-            amount
-            url 
-          }
+          amount
+          url
         }
       }
+    }
   `;
 
   const orders = query(client, {
     query: ORDERS_BY_STATUS,
-    variables: {}
+    variables: {
+      status: status
+    }
   });
 
   const ADD_ORDER = gql`
@@ -51,17 +58,38 @@
     }
   `;
 
+  const PRINT_ORDER = gql`
+    mutation printOrder($id: ID!) {
+      printOrder(id: $id) {
+        id
+      }
+    }
+  `;
+
   async function addOrder(order) {
-    if(order.goupphoto) order.status = "ON_HOLD";
-    else if(order.digital && !order.print) order.status = "DONE";
-    else if(order.print) order.status = "IN_PRODUCTION";
+    if (order.groupphoto) order.status = "ON_HOLD";
+    else if (order.digital && !order.print) order.status = "DONE";
+    else if (order.print) order.status = "IN_PRODUCTION";
     else order.status = "ERROR";
 
+    console.log(order);
+
     try {
-      await mutate(client, {
+      const result = await mutate(client, {
         mutation: ADD_ORDER,
         variables: { order: order }
       });
+
+      console.log(result);
+
+      if (result && order.status == "IN_PRODUCTION") {
+        await mutate(client, {
+          mutation: PRINT_ORDER,
+          variables: {
+            id: result.data.createOrder.id
+          }
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -69,8 +97,22 @@
     showOrderCreateModal = false;
   }
 
-  $: orders.refetch({status});
+  const NEW_ORDER = gql`
+    subscription {
+      newOrder {
+        id
+        name
+      }
+    }
+  `;
 
+  // const orderSubscription = subscribe(client, { query: NEW_ORDER });
+
+  // orderSubscription.subscribe((data)=> {
+  //   console.log(data);
+  // })
+
+  $: orders.refetch({ status });
 </script>
 
 <style>
@@ -138,13 +180,21 @@
 {/if}
 
 {#if orderActionTarget}
-  <OrderActionModal order={orderActionTarget} on:close={() => {orderActionTarget = null; orders.refetch(status);}}>Dit
-    is een test</OrderActionModal>
+  <OrderActionModal
+    order={orderActionTarget}
+    on:close={() => {
+      orderActionTarget = null;
+      orders.refetch(status);
+    }}>
+    Dit is een test
+  </OrderActionModal>
 {/if}
 
 <div class="body">
   <div class="nav">
-    <button on:click={() => (showOrderCreateModal = true)}>Order toevoegen</button>
+    <button on:click={() => (showOrderCreateModal = true)}>
+      Order toevoegen
+    </button>
 
     <div class="grow" />
 
@@ -152,7 +202,11 @@
       <input id="onhold" type="radio" bind:group={status} value={'ON_HOLD'} />
       <label for="onhold">ON_HOLD</label>
 
-      <input id="production" type="radio" bind:group={status} value={'IN_PRODUCTION'} />
+      <input
+        id="production"
+        type="radio"
+        bind:group={status}
+        value={'IN_PRODUCTION'} />
       <label for="production">PRODUCTION</label>
 
       <input id="error" type="radio" bind:group={status} value={'ERROR'} />
@@ -174,6 +228,8 @@
           }}
           {order} />
       {:else}er zijn momenteel geen orders;{/each}
+    {:catch}
+
     {/await}
   </div>
 </div>

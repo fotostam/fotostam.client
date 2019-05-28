@@ -1,7 +1,7 @@
 <script>
   import { gql } from "apollo-boost";
   import { getClient, query } from "svelte-apollo";
-    import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -42,7 +42,7 @@
   }
 
   .autocomplete-result:hover {
-    background-color:lightgray;
+    background-color: lightgray;
   }
 
   input {
@@ -52,7 +52,6 @@
   img {
     width: 100%;
   }
-
 </style>
 
 <div class="autocomplete">
@@ -61,12 +60,16 @@
     <li>Loading...</li>
   {:then results}
     <div class="autocomplete-results {!isOpen ? ' hide-results' : ''}">
-      {#each results.data.findImage.slice(0,20) as result, i}
-        <div class="autocomplete-result" on:click={e => dispatch('select',{tag:result.filename})}>
-          <img src={result.url} alt={result.filename} />
-          <span>{ result.filename }</span>
-        </div>
-      {/each}
+      {#if results.data.findImage}
+        {#each results.data.findImage.slice(0, 20) as result, i}
+          <div
+            class="autocomplete-result"
+            on:click={e => dispatch('select', { tag: result.filename })}>
+            <img src={result.url} alt={result.filename} />
+            <span>{result.filename}</span>
+          </div>
+        {/each}
+      {/if}
     </div>
   {/await}
 </div>

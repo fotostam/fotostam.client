@@ -6,9 +6,9 @@
   const dispatch = createEventDispatcher();
 
   let name = "";
-  let subtype = "";
+  let subtype = "PERSONAL";
   let group = "";
-  let camp = "";
+  let camp = 0;
   let groupphoto = false;
   let digital = false;
   let print = true;
@@ -24,6 +24,7 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.3);
+    z-index: 100;
   }
 
   .modal {
@@ -39,6 +40,7 @@
     padding: 1em;
     border-radius: 0.2em;
     background: white;
+    z-index: 101;
   }
 
   .input {
@@ -63,6 +65,11 @@
     display: flex;
   }
 
+  .group {
+    width: 100%;
+    display: flex;
+  }
+
   .photo-input input[type="text"] {
     flex-grow: 1;
   }
@@ -74,51 +81,59 @@
 
 <div transition:fade class="modal-background" />
 
-<div transition:fly={{ y: 200, duration: 1000 }} class="modal">
+<div transition:fly={{ y: 200, duration: 200 }} class="modal">
   <div class="input">
     <slot name="header" />
     <hr />
+    <div class="group">
+      <input type="text" bind:value={name} placeholder="Naam" />
+    </div>
 
-    <input type="text" bind:value={name} placeholder="Naam" />
+    <div class="group">
+      <input type="email" bind:value={email} placeholder="Email" />
+    </div>
+    <div class="group">
+      <div class="group">
+        <input type="text" bind:value={group} placeholder="Groep" />
+      </div>
+      <select bind:value={camp}>
+        <option value={1}>Subkamp 1</option>
+        <option value={2}>Subkamp 2</option>
+        <option value={3}>Subkamp 3</option>
+        <option value={4}>Subkamp 4</option>
+        <option value={5}>Subkamp 5</option>
+        <option value={6}>Subkamp 6</option>
+        <option value={0}>-geen-</option>
+      </select>
 
-    <input type="text" bind:value={group} placeholder="Groep" />
-
-    <select bind:value={camp}>
-      <option value="1">Subkamp 1</option>
-      <option value="2">Subkamp 2</option>
-      <option value="3">Subkamp 3</option>
-      <option value="4">Subkamp 4</option>
-      <option value="5">Subkamp 5</option>
-      <option value="6">Subkamp 6</option>
-      <option value="0">-geen-</option>
-    </select>
-
-    <select bind:value={subtype}>
-    <option value="BEVERS">Bevers</option>
-    <option value="WELPEN">Welpen</option>
-    <option value="SCOUTS">Scouts</option>
-    <option value="EXPLORERS">Explo</option>
-    <option value="PIVO">Pivo</option>
-    <option value="STAFF">Staff</option>
-    <option value="BRONBEEK">Bronbeek</option>
-      <option value="PERSONAL">Persoonlijk</option>
-    </select>
-
-    <input type="email" bind:value={email} placeholder="Email"/>
+      <select bind:value={subtype}>
+        <option value="BEVERS">Bevers</option>
+        <option value="WELPEN">Welpen</option>
+        <option value="SCOUTS">Scouts</option>
+        <option value="EXPLORERS">Explo</option>
+        <option value="PIVO">Pivo</option>
+        <option value="STAFF">Staff</option>
+        <option value="BRONBEEK">Bronbeek</option>
+        <option value="PERSONAL">Persoonlijk</option>
+      </select>
+    </div>
 
     <label>
-      <input type=checkbox bind:checked={digital}>
+      <input type="checkbox" bind:checked={digital} />
       Digitaal
+      <span style="color:gray">- fotos via email versturen (na kamp)</span>
     </label>
 
     <label>
-      <input type=checkbox bind:checked={print}>
+      <input type="checkbox" bind:checked={print} />
       Printen
+      <span style="color:gray">- order direct printen</span>
     </label>
 
     <label>
       <input type="checkbox" bind:checked={groupphoto} />
       Groepsfoto
+      <span style="color:gray">- order is groepsfoto</span>
     </label>
 
     <hr />
@@ -140,17 +155,17 @@
       <button
         class="order-button"
         on:click={() => dispatch('order', {
-            order: { 
-              name: name, 
-              group: group, 
+            order: {
+              name: name,
+              group: group,
               photos: photos,
               subtype: subtype,
               camp: camp,
               digital: digital,
-              email: email, 
+              email: email,
               print: print,
-              groupphoto: groupphoto,
-              },
+              groupphoto: groupphoto
+            }
           })}>
         {#if !print}Order plaatsen{:else}Order printen{/if}
       </button>
@@ -159,7 +174,7 @@
   <div class="selector">
     <PhotoInput
       on:select={e => {
-        photos = [...photos, { tag: e.detail.tag, amount: 1 }];
+        photos = [...photos, { tag: e.detail.tag, amount: 1, status: 'HEALTHY' }];
       }} />
   </div>
 </div>
