@@ -4,6 +4,7 @@
   import CreateOrderModal from "./components/CreateOrderModal.svelte";
   import OrderActionModal from "./components/OrderActionModal.svelte";
   import Order from "./components/Order.svelte";
+  import PhotoInput from "./components/PhotoInput.svelte";
 
   const client = new ApolloClient({
     uri: "http://localhost:4000"
@@ -18,6 +19,8 @@
   let status = "IN_PRODUCTION";
 
   let search = "";
+
+  let listView = false;
 
   const ORDERS_BY_STATUS = gql`
     query OrdersByStatus($status: Status!) {
@@ -151,7 +154,7 @@
     background-color: #3277b3;
   }
 
-  .orderList {
+  .orderGrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 10px;
@@ -161,6 +164,10 @@
     padding: 10px;
     height: 100%;
   }
+  
+  .orderList {
+
+  }
 
   .filter {
     align-self: flex-end;
@@ -169,6 +176,45 @@
   .grow {
     flex-grow: 1;
   }
+
+  /** Switch
+ -------------------------------------*/
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+}
+
+/**
+ * 1. Adjust this to size
+ */
+
+.switch {
+  display: inline-block;
+  font-size: 20px; /* 1 */
+  height: 1em;
+  width: 2em;
+  background: #BDB9A6;
+  border-radius: 1em;
+  margin: 10px;
+}
+
+.switch div {
+  height: 1em;
+  width: 1em;
+  border-radius: 1em;
+  background: #FFF;
+  box-shadow: 0 0.1em 0.3em rgba(0,0,0,0.3);
+  -webkit-transition: all 300ms;
+     -moz-transition: all 300ms;
+          transition: all 300ms;
+}
+
+.switch input:checked + div {
+  -webkit-transform: translate3d(100%, 0, 0);
+     -moz-transform: translate3d(100%, 0, 0);
+          transform: translate3d(100%, 0, 0);
+}
 </style>
 
 {#if showOrderCreateModal}
@@ -198,6 +244,12 @@
 
     <div class="grow" />
 
+    <input type="text" bind:value={search}>
+
+    <div class="grow" />
+
+    <label class="switch"><input type=checkbox bind:checked={listView}><div></div></label>
+
     <div class="filter">
       <input id="onhold" type="radio" bind:group={status} value={'ON_HOLD'} />
       <label for="onhold">ON_HOLD</label>
@@ -217,7 +269,13 @@
     </div>
   </div>
 
-  <div class="orderList">
+  {#if search.length > 0}
+    <PhotoInput
+      on:select={e => {
+        photos = [...photos, { tag: e.detail.tag, amount: 1, status: 'HEALTHY' }];
+      }} />
+  {:else}
+  <div class="{ listView?"orderList":"orderGrid"}">
     {#await $orders}
       <li>Loading...</li>
     {:then result}
@@ -226,10 +284,12 @@
           on:click={() => {
             orderActionTarget = order;
           }}
+          listView={listView}
           {order} />
       {:else}er zijn momenteel geen orders;{/each}
     {:catch}
 
     {/await}
   </div>
+  {/if}
 </div>

@@ -3,10 +3,13 @@
   import moment from "moment";
 
   export let order;
+  export let listView;
 
   const dispatch = createEventDispatcher();
 
   let badge = moment(order.createdAt).format("dd HH:mm");
+
+  let totalPhotos = order.photos.reduce((acc,current) => acc+current.amount,0);
 </script>
 
 <style>
@@ -112,8 +115,14 @@
     padding: 5px 5px;
     border-radius: 50%;
   }
+
+  .list-order {
+    list-style-type: none;
+    margin: 10px 5px;
+  }
 </style>
 
+{#if !listView}
 <div class="card status-{order.status}" on:click={() => dispatch('click')}>
   <div class="header">
      {order.name} - {order.group}
@@ -133,3 +142,8 @@
     {:else}Dit is een lege order{/each}
   </div>
 </div>
+{:else}
+  <li class="header list-order status-{order.status}" on:click={() => dispatch('click')}>
+      {badge} | {order.name} - {order.group} {order.subtype} {order.camp} | <span>x{totalPhotos}</span>
+  </li>
+{/if}
